@@ -13,32 +13,49 @@ class Main extends React.Component {
     
 
 		this.state = {
-			gridFull: Array(this.rows).fill().map(() => Array(this.cols).fill(false))
+      gridFull: Array(this.rows).fill().map(() => Array(this.cols).fill(false)),
+      gridColors: Array(this.rows).fill().map(() => Array(this.cols).fill("#FFF"))
 		}
   }
   
   selectBox = (row, col) => {
     let gridCopy = arrayClone(this.state.gridFull);
+    let colorCopy = arrayClone(this.state.gridColors);
+
+    if (gridCopy[row][col]) {
+      colorCopy[row][col] = "FFF"
+    }
+    else {
+      colorCopy[row][col] = generateColor();
+    }
+
     gridCopy[row][col] = !gridCopy[row][col];
+
+
+
     this.setState({
-      gridFull: gridCopy
+      gridFull: gridCopy,
+      gridColors: colorCopy
     })
   }
 
   seed = () => {
     
     let gridCopy = arrayClone(this.state.gridFull);
+    let colorCopy = arrayClone(this.state.gridColors);
     for (let i=0; i<this.seeds; ) {
       let x = Math.floor(Math.random() * this.rows);
       let y = Math.floor(Math.random() * this.cols);
 
       if (gridCopy[x][y] === false)
         gridCopy[x][y] = true;
+        colorCopy[x][y] = generateColor();
         i++;
     }
 
     this.setState({
-      gridFull:  gridCopy
+      gridFull:  gridCopy,
+      gridColors: colorCopy
     })
   }
 
@@ -54,8 +71,10 @@ class Main extends React.Component {
   clear = () => {
     clearInterval(this.intervalId);
     let grid = Array(this.rows).fill().map(() => Array(this.cols).fill(false));
+    let colors = Array(this.rows).fill().map(() => Array(this.cols).fill("#FFF"));
     this.setState({
       gridFull: grid,
+      gridColors: colors,
    })
   }
 
@@ -63,38 +82,51 @@ class Main extends React.Component {
     let flag = true;
     let g = this.state.gridFull;
     let g2 = arrayClone(this.state.gridFull);
+    let c = this.state.gridColors;
+    let c2 = arrayClone(this.state.gridColors);
 
-    
     for (let i = 0; i < this.rows; i++) {
 		  for (let j = 0; j < this.cols; j++) {
-        let count = 0;
+
         
-		    if (i > 0) if (g[i - 1][j]) count++;
-		    if (j < this.cols - 1) if (g[i][j + 1]) count++;
-		    if (j > 0) if (g[i][j - 1]) count++;
-		    if (i < this.rows - 1) if (g[i + 1][j]) count++;
-	
-	
-        if (!g[i][j]) 
-        {
+        
+        if (!g[i][j]){
+          let neighbours = [];
           flag = false;
-          if (count > 0)
+          if (i > 0) if (g[i - 1][j]) {
             g2[i][j] = true;
+            neighbours.push(c[i-1][j])
+            //c2[i][j] = c[i-1][j];
+          }
+          if (j < this.cols - 1) if (g[i][j + 1]) {
+            g2[i][j] = true;
+            neighbours.push(c[i][j+1]);
+            //c2[i][j] = c[i][j+1];
+          }
+          if (j > 0) if (g[i][j - 1]) {
+            g2[i][j] = true;
+            neighbours.push(c[i][j-1]); 
+            //c2[i][j] = c[i][j-1]; 
+          }
+          if (i < this.rows - 1) if (g[i + 1][j]) {
+            g2[i][j] = true;
+            neighbours.push(c[i+1][j]);
+            //c2[i][j] = c[i+1][j];
+          } 
+          if (neighbours.length > 0) c2[i][j] = neighbours[mostFrequent(neighbours)];
+          
         }
       }
     }
 
     if (flag) clearInterval(this.intervalId);
-    
-  
 		this.setState({
       gridFull: g2,
+      gridColors: c2
     });
+  
   }
   
-  generateColor () {
-    return '#' +  Math.random().toString(16).substr(-6);
-  }
 
   
 
@@ -111,7 +143,8 @@ class Main extends React.Component {
           seedButton={this.seed}        
         />
 				<Grid
-					gridFull={this.state.gridFull}
+          gridFull={this.state.gridFull}
+          gridColors={this.state.gridColors}
 					rows={this.rows}
 					cols={this.cols}
 					selectBox={this.selectBox}
@@ -146,17 +179,27 @@ class Buttons extends React.Component {
 
 class Grid extends React.Component {
 	render() {
-		const width = (this.props.cols * 8);
+		const width = (this.props.cols * 9);
 		var rowsArr = [];
 
-    var boxClass = "";
-    var boxColor = "#000";
+    var boxClass = "box";
+    var boxColor = "#FFF";
 		for (var i = 0; i < this.props.rows; i++) {
 			for (var j = 0; j < this.props.cols; j++) {
 				let boxId = i + "_" + j;
 
-        boxClass = this.props.gridFull[i][j] ? "box on" : "box off";
-        boxColor = this.props.gridFull[i][j] ? "#FAB" : "#FFF";
+        if (this.props.gridFull[i][j]){
+          boxColor = {
+            backgroundColor: `${this.props.gridColors[i][j]}`
+          }
+        }
+        else {
+          boxColor = {
+            backgroundColor: `${this.props.gridColors[i][j]}`
+          }
+        }
+      
+     
         
 				rowsArr.push(
 					<Box
@@ -166,7 +209,7 @@ class Grid extends React.Component {
 						boxId={boxId}
 						row={i}
 						col={j}
-						selectBox={this.props.selectBox}
+            selectBox={this.props.selectBox}
 					/>
 				);
 			}
@@ -186,9 +229,9 @@ class Box extends React.Component {
 	}
 
 	render() {
-    let style = {
-      backgroundColor: this.props.boxColor
-    }
+    // var divStyle = {
+    //   backgroundColor: {this.props.boxColor}
+    // };
 		return (
 			<div
         className={this.props.boxClass}
@@ -196,7 +239,7 @@ class Box extends React.Component {
 				id={this.props.boxId}
         onClick={this.selectBox}
 
-        style={{style}}
+        style={this.props.boxColor}
         
 			/>
 		);
@@ -205,6 +248,31 @@ class Box extends React.Component {
 
 function arrayClone(arr) {
   return JSON.parse(JSON.stringify(arr));
+}
+
+function mostFrequent(arr) {
+  let max = 0;
+  let mode = '';
+  let counter = 0;
+
+  for(var i = 0; i < arr.length; i++){
+    counter = 0;
+    for (var j = 0; j < arr.length; j++)
+    {
+    if (arr[i] === arr[j]) {
+      counter++
+      if (counter > max) max = counter;
+      mode = i;
+    }    
+  }
+ }
+ console.log(mode);
+ return arr[mode];
+
+}
+
+function generateColor () {
+  return '#' +  Math.random().toString(16).substr(-6);
 }
 
 
