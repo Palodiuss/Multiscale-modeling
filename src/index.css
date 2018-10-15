@@ -5,22 +5,11 @@ body {
 .box {
   display: inline-block;       
   border: none;
-  width: 9px;
-  height: 9px;
-  margin: 0px;
+  width: 8px;
+  height: 8px;
   }
 
-.off {
-  background-color: #FFF;
-}
 
-.on {
-  background-color: rgb(75, 0, 160);
-}
-  
-.box:hover { 
-  background-color: rgb(223, 189, 0);
-}
 
 .center {
   margin: auto;

@@ -1,61 +1,67 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
+
 import { ButtonToolbar } from 'react-bootstrap';
 
 class Main extends React.Component {
-  constructor() {
-		super();
-		this.speed = 10;
-		this.rows = 100;
-    this.cols = 100;
+  constructor(props) {
+		super(props);
+		this.speed = 100;
+		this.rows = 50;
+    this.cols = 50;
     this.seeds = 10;
-    
+    this.selectBox = this.selectBox.bind(this);
+    this.seed = this.seed.bind(this);
+    this.playButton = this.playButton.bind(this);
+    this.pauseButton = this.pauseButton.bind(this);
+    this.clear = this.clear.bind(this);
+    this.save = this.save.bind(this);
+    this.load = this.load.bind(this);
+    this.play = this.play.bind(this);
 
 		this.state = {
-      gridFull: Array(this.rows).fill().map(() => Array(this.cols).fill(false)),
-      gridColors: Array(this.rows).fill().map(() => Array(this.cols).fill("#FFF"))
+      gridFull: Array(this.rows).fill().map(() => Array(this.cols).fill("#FFF")),
+      colors: []
 		}
   }
+
+  generateColor () {
+    return '#' + Math.random().toString(16).slice(2, 8).toUpperCase();     
+  }
+
   
   selectBox = (row, col) => {
     let gridCopy = arrayClone(this.state.gridFull);
-    let colorCopy = arrayClone(this.state.gridColors);
 
-    if (gridCopy[row][col]) {
-      colorCopy[row][col] = "FFF"
+    if (gridCopy[row][col] === "#FFF") {
+        gridCopy[row][col] = this.generateColor();
     }
     else {
-      colorCopy[row][col] = generateColor();
+      gridCopy[row][col] = "#FFF"
     }
 
-    gridCopy[row][col] = !gridCopy[row][col];
-
-
-
     this.setState({
-      gridFull: gridCopy,
-      gridColors: colorCopy
+      gridFull: gridCopy
     })
+
   }
 
   seed = () => {
     
     let gridCopy = arrayClone(this.state.gridFull);
-    let colorCopy = arrayClone(this.state.gridColors);
+
     for (let i=0; i<this.seeds; ) {
       let x = Math.floor(Math.random() * this.rows);
       let y = Math.floor(Math.random() * this.cols);
 
-      if (gridCopy[x][y] === false)
-        gridCopy[x][y] = true;
-        colorCopy[x][y] = generateColor();
+      if (gridCopy[x][y] === "#FFF")
+        gridCopy[x][y] = this.generateColor();
         i++;
     }
 
     this.setState({
-      gridFull:  gridCopy,
-      gridColors: colorCopy
+      gridFull:  gridCopy
     })
   }
 
@@ -70,66 +76,71 @@ class Main extends React.Component {
 
   clear = () => {
     clearInterval(this.intervalId);
-    let grid = Array(this.rows).fill().map(() => Array(this.cols).fill(false));
-    let colors = Array(this.rows).fill().map(() => Array(this.cols).fill("#FFF"));
+    let grid = Array(this.rows).fill().map(() => Array(this.cols).fill("#FFF"));
     this.setState({
-      gridFull: grid,
-      gridColors: colors,
+      gridFull: grid
    })
+  }
+
+  save = () => {
+    clearInterval(this.intervalId); 
+    const json = JSON.stringify(this.state.gridFull);
+    localStorage.setItem('grid', json);      
+  }
+  
+
+  load = () => {
+    clearInterval(this.intervalId);
+    const json = localStorage.getItem('grid');
+    const gridFull = JSON.parse(json);
+    if (gridFull) {
+      this.setState(() => ({gridFull}))
+    }
   }
 
   play = () => {
     let flag = true;
     let g = this.state.gridFull;
     let g2 = arrayClone(this.state.gridFull);
-    let c = this.state.gridColors;
-    let c2 = arrayClone(this.state.gridColors);
 
     for (let i = 0; i < this.rows; i++) {
 		  for (let j = 0; j < this.cols; j++) {
-
         
-        
-        if (!g[i][j]){
+        if (g[i][j] === "#FFF"){
           let neighbours = [];
           flag = false;
-          if (i > 0) if (g[i - 1][j]) {
-            g2[i][j] = true;
-            neighbours.push(c[i-1][j])
-            //c2[i][j] = c[i-1][j];
+          if (i > 0) if (g[i - 1][j]!=="#FFF") {
+            g2[i][j] = this.generateColor();
+            neighbours.push(g[i-1][j])
           }
-          if (j < this.cols - 1) if (g[i][j + 1]) {
-            g2[i][j] = true;
-            neighbours.push(c[i][j+1]);
-            //c2[i][j] = c[i][j+1];
+          if (j < this.cols - 1) if (g[i][j + 1]!=="#FFF") {
+            g2[i][j] = this.generateColor();
+            neighbours.push(g[i][j+1]);
           }
-          if (j > 0) if (g[i][j - 1]) {
-            g2[i][j] = true;
-            neighbours.push(c[i][j-1]); 
-            //c2[i][j] = c[i][j-1]; 
+          if (j > 0) if (g[i][j - 1]!=="#FFF") {
+            g2[i][j] = this.generateColor();
+            neighbours.push(g[i][j-1]); 
           }
-          if (i < this.rows - 1) if (g[i + 1][j]) {
-            g2[i][j] = true;
-            neighbours.push(c[i+1][j]);
-            //c2[i][j] = c[i+1][j];
+          if (i < this.rows - 1) if (g[i + 1][j]!=="#FFF") {
+            g2[i][j] = this.generateColor();
+            neighbours.push(g[i+1][j]);
           } 
-          if (neighbours.length > 0) c2[i][j] = neighbours[mostFrequent(neighbours)];
-          
+          if (neighbours.length > 0) g2[i][j] = mostFrequent(neighbours);          
         }
       }
     }
 
     if (flag) clearInterval(this.intervalId);
 		this.setState({
-      gridFull: g2,
-      gridColors: c2
+      gridFull: g2
     });
   
   }
   
-
-  
-
+  onChange(e) {
+    let files=e.target.files;
+    console.log("file:",files);
+  }
 
 
   render () {
@@ -140,11 +151,13 @@ class Main extends React.Component {
           playButton={this.playButton}
           pauseButton={this.pauseButton}
           clearButton={this.clear}
-          seedButton={this.seed}        
+          seedButton={this.seed} 
+          saveButton={this.save}
+          loadButton={this.load}       
         />
+        <input type="file" name="file" onChange={(e)=>this.onChange(e)}/>
 				<Grid
           gridFull={this.state.gridFull}
-          gridColors={this.state.gridColors}
 					rows={this.rows}
 					cols={this.cols}
 					selectBox={this.selectBox}
@@ -171,6 +184,12 @@ class Buttons extends React.Component {
             <button className="btn btn-default" onClick={this.props.seedButton}>
             seed
             </button>
+            <button className="btn btn-default" onClick={this.props.saveButton}>
+            save
+            </button>
+            <button className="btn btn-default" onClick={this.props.loadButton}>
+            load
+            </button>
           </ButtonToolbar>        
       </div>
     )
@@ -179,32 +198,23 @@ class Buttons extends React.Component {
 
 class Grid extends React.Component {
 	render() {
-		const width = (this.props.cols * 9);
+    var boxColorHover = {backgroundColor: "#000"};
+		const width = (this.props.cols * 8);
 		var rowsArr = [];
-
-    var boxClass = "box";
-    var boxColor = "#FFF";
+    
 		for (var i = 0; i < this.props.rows; i++) {
 			for (var j = 0; j < this.props.cols; j++) {
-				let boxId = i + "_" + j;
-
-        if (this.props.gridFull[i][j]){
-          boxColor = {
-            backgroundColor: `${this.props.gridColors[i][j]}`
-          }
-        }
-        else {
-          boxColor = {
-            backgroundColor: `${this.props.gridColors[i][j]}`
-          }
-        }
+        let boxId = i + "_" + j;
+        
+        var boxColor = {backgroundColor: `${this.props.gridFull[i][j]}`}
       
      
         
 				rowsArr.push(
 					<Box
-            boxClass={boxClass}
+            boxClass="box"
             boxColor={boxColor}
+            boxColorHover={boxColorHover}
 						key={boxId}
 						boxId={boxId}
 						row={i}
@@ -224,22 +234,35 @@ class Grid extends React.Component {
 }
 
 class Box extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      hover: false,
+    }
+  }
+
 	selectBox = () => {
 		this.props.selectBox(this.props.row, this.props.col);
-	}
+  }
+  
+  hoverOn = () => {
+    this.setState({ hover: true });
+  }
+  hoverOff = () => {
+    this.setState({ hover: false });
+  }
 
 	render() {
-    // var divStyle = {
-    //   backgroundColor: {this.props.boxColor}
-    // };
 		return (
 			<div
         className={this.props.boxClass}
         
 				id={this.props.boxId}
         onClick={this.selectBox}
+        onMouseEnter={this.hoverOn} 
+        onMouseLeave={this.hoverOff}
 
-        style={this.props.boxColor}
+        style={this.state.hover ? this.props.boxColorHover : this.props.boxColor}
         
 			/>
 		);
@@ -252,7 +275,7 @@ function arrayClone(arr) {
 
 function mostFrequent(arr) {
   let max = 0;
-  let mode = '';
+  let mode = 0;
   let counter = 0;
 
   for(var i = 0; i < arr.length; i++){
@@ -266,14 +289,11 @@ function mostFrequent(arr) {
     }    
   }
  }
- console.log(mode);
  return arr[mode];
 
 }
 
-function generateColor () {
-  return '#' +  Math.random().toString(16).substr(-6);
-}
+ 
 
 
 ReactDOM.render(<Main />, document.getElementById('root'));
