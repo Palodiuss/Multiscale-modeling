@@ -1,0 +1,83 @@
+body {
+  background: radial-gradient(ellipse at center, #212121 0%, #2b2b2b 100%);
+}
+  
+.box {
+  display: inline-block;       
+  border: none;
+  width: 12px;
+  height: 12px;
+  }
+
+
+
+.center {
+  margin: auto;
+  display: table;
+  margin-top: 10px;
+}
+
+.grid {
+  width: 150px;
+  line-height: 0;
+  margin: auto;
+  margin-top: 20px;
+}
+  
+h1, h2, h3, h4 {
+  color: white;
+  margin: auto;
+  text-align: center;
+  width: 50%;
+  margin-top: 10px;
+}
+
+.title-header {
+  color: #fff;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  background-color: #663399;
+  border-color: #532b7a;
+  text-shadow: 1px 1px 0 #9823d5;
+
+  background: #663399;
+  border: none;
+  border-bottom: .6rem solid darken(#663399, 10%);
+  color: white;
+  font-weight: bold;
+  font-size: 2.4rem;
+  margin-bottom: 2.4rem;
+  
+  width: 100%;
+}
+
+h4 {
+  margin-top: 0px;
+}
+
+input[type="file"] {
+  display: none;
+}
+
+.custom-file-upload {
+  border: 1px solid #ccc;
+  display: inline-block;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.btn {
+  background: #ccc;
+  border: none;
+  border-bottom: .3rem solid darken(#ccc, 10%);
+  font-weight: 500;
+  padding: 0.5rem 1.0rem;
+  margin-bottom: 0.5rem;
+  flex-grow: 1;
+}
+
+.button-toolbar {
+  display: flex;
+  justify-content: center; 
+}
+
