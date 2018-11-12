@@ -16,14 +16,8 @@ export default class SeedGrowth extends React.Component {
     this.cols = 50;
     this.seeds = 10;
     this.selectBox = this.selectBox.bind(this);
-    this.seed = this.seed.bind(this);
-    this.playButton = this.playButton.bind(this);
-    this.pauseButton = this.pauseButton.bind(this);
-    this.clear = this.clear.bind(this);
-    this.save = this.save.bind(this);
-    this.load = this.load.bind(this);
-    this.play = this.play.bind(this);
-    this.onSave = this.onSave.bind(this);
+
+
     this.width = this.cols * 12;
 
 		this.state = {
