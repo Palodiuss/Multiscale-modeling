@@ -8,20 +8,14 @@ export default class Buttons extends React.Component {
             <button className="btn" onClick={this.props.playButton}>
               Play
             </button>
-            <button className="btn" onClick={this.props.pauseButton}>
-              pause
-            </button>
             <button className="btn" onClick={this.props.clearButton}>
               clear
             </button>
             <button className="btn" onClick={this.props.seedButton}>
-            seed
+            nukleons
             </button>
-            <button className="btn" onClick={this.props.saveButton}>
-            save
-            </button>
-            <button className="btn" onClick={this.props.loadButton}>
-            load
+            <button className="btn" onClick={this.props.inclusionsButton}>
+            inclusions
             </button>
             <button className="btn" onClick={this.props.onSave}>
             Save File

@@ -11,33 +11,36 @@ import mostFrequent from './MostFrequent.js';
 export default class SeedGrowth extends React.Component {
   constructor(props) {
 		super(props);
-		this.speed = 100;
-		this.rows = 50;
-    this.cols = 50;
+		this.rows = 100;
+    this.cols = 100;
     this.seeds = 10;
-    this.selectBox = this.selectBox.bind(this);
-    this.seed = this.seed.bind(this);
-    this.playButton = this.playButton.bind(this);
-    this.pauseButton = this.pauseButton.bind(this);
-    this.clear = this.clear.bind(this);
-    this.save = this.save.bind(this);
-    this.load = this.load.bind(this);
-    this.play = this.play.bind(this);
-    this.onSave = this.onSave.bind(this);
-    this.width = this.cols * 12;
+    // this.selectBox = this.selectBox.bind(this);
+    // this.seed = this.seed.bind(this);
+    // this.clear = this.clear.bind(this);
+    // this.save = this.save.bind(this);
+    // this.load = this.load.bind(this);
+    // this.play = this.play.bind(this);
+    // this.onSave = this.onSave.bind(this);
+    this.width = this.cols * 5;
+    this.number = 0;
+    this.enabled = false;
 
 		this.state = {
       gridFull: Array(this.rows).fill().map(() => Array(this.cols).fill("#FFF")),
-      colors: []
+      finished: false,
+      inclusionsType: 'square',
+      inclusionsNumber: 15,
+      inclusionsRadius: 3
     }
 
     this.fileReader = new FileReader();
     this.fileReader.onload = event => {
-      this.setState({ gridFull: JSON.parse(event.target.result) }, () => {
-        console.log(this.state.jsonFile);
+      this.setState({ gridFull: JSON.parse(event.target.result),
+      finished: this.chekIfFinished() }, () => {
       });
     };
   }
+  
   
 
 
@@ -59,10 +62,10 @@ export default class SeedGrowth extends React.Component {
   }
 
   seed = () => {
-    
+    this.enabled = true;
     let gridCopy = arrayClone(this.state.gridFull);
 
-    for (let i=0; i<this.seeds; ) {
+    for (let i=0; i<this.state.inclusionsNumber; ) {
       let x = Math.floor(Math.random() * this.rows);
       let y = Math.floor(Math.random() * this.cols);
 
@@ -71,91 +74,227 @@ export default class SeedGrowth extends React.Component {
         i++;
     }
 
+
+
     this.setState({
       gridFull:  gridCopy
     })
   }
 
-  playButton = () => {
-    clearInterval(this.intervalId)
-    this.intervalId = setInterval(this.play, this.speed);
+  addInclusionsSquare = () => {  
+    let radius = this.state.inclusionsRadius-1;
+    let gridCopy = arrayClone(this.state.gridFull);
+
+    if (this.state.finished === false) {
+      for (let i=0; i<this.state.inclusionsNumber; ) {
+        
+        let x = Math.floor(Math.random() * (this.rows-(2*radius))) + radius;
+        let y = Math.floor(Math.random() * (this.cols-(2*radius))) + radius;
+
+        if (gridCopy[x][y] === "#FFF"){          
+          if (this.checkNeighboursSquare(x, y, radius, gridCopy))
+          {            
+            for (let j=x-radius; j<x+radius; j++)
+              for (let k=y-radius; k<y+radius; k++)
+                gridCopy[j][k] = "#000";
+            i++;
+          }
+        }
+      }
+    }
+    else {    
+        for (let i=0; i<this.state.inclusionsNumber; ) {
+          let x = Math.floor(Math.random() * (this.rows-(2*radius))) + radius;
+          let y = Math.floor(Math.random() * (this.cols-(2*radius))) + radius;
+          let cellColor = gridCopy[x][y];
+
+          if (
+            cellColor !== gridCopy[x-1][y] ||
+            cellColor !== gridCopy[x][y-1] ||
+            cellColor !== gridCopy[x+1][y] ||
+            cellColor !== gridCopy[x][y+1]
+          )
+          {           
+            if (this.checkNeighboursSquare(x, y, radius, gridCopy))
+            {            
+              for (let j=x-radius; j<x+radius; j++)
+                for (let k=y-radius; k<y+radius; k++)
+                  gridCopy[j][k] = "#000";
+              i++;
+            }
+          }
+        }
+  }
+  this.setState({
+    gridFull:  gridCopy
+  })
+}
+
+  checkNeighboursSquare = (x, y, z, gridCopy) => {
+    let flag = true;
+    for (let i=x-z; i<x+z; i++)
+      for (let j=y-z; j<y+z; j++)
+        if (gridCopy[i][j] === "#000")
+          flag = false;
+    
+    return flag;
   }
 
-  pauseButton = () => {
-    clearInterval(this.intervalId);
+  addInclusionsRound = () => {  
+    let radius = this.state.inclusionsRadius-1;
+    let gridCopy = arrayClone(this.state.gridFull);
+
+    if (this.state.finished === false) {
+      for (let i=0; i<this.state.inclusionsNumber; ) {
+        
+        let x = Math.floor(Math.random() * (this.rows-(2*radius))) + radius;
+        let y = Math.floor(Math.random() * (this.cols-(2*radius))) + radius;
+
+        if (gridCopy[x][y] === "#FFF"){          
+          if (this.checkNeighboursRound(x, y, radius, gridCopy))
+          {            
+            for (let j=x-radius; j<=x+radius; j++)
+              for (let k=y-radius; k<=y+radius; k++)
+              {
+                if ( ((j-x)*(j-x)) + ((k-y)*(k-y)) <= ((radius)*(radius)) )
+                  gridCopy[j][k] = "#000";
+              }
+            i++;
+          }
+        }
+      }
+    }
+    else {    
+        for (let i=0; i<this.state.inclusionsNumber; ) {
+          let x = Math.floor(Math.random() * (this.rows-(2*radius))) + radius;
+          let y = Math.floor(Math.random() * (this.cols-(2*radius))) + radius;
+          let cellColor = gridCopy[x][y];
+
+          if (
+            cellColor !== gridCopy[x-1][y] ||
+            cellColor !== gridCopy[x][y-1] ||
+            cellColor !== gridCopy[x+1][y] ||
+            cellColor !== gridCopy[x][y+1]
+          )
+          {           
+            if (this.checkNeighboursRound(x, y, radius, gridCopy))
+            {            
+              for (let j=x-radius; j<=x+radius; j++)
+                for (let k=y-radius; k<=y+radius; k++)
+                {
+                  if ( ((j-x)*(j-x)) + ((k-y)*(k-y)) <= ((radius)*(radius)) )
+                    gridCopy[j][k] = "#000";
+                }
+              i++;
+            }
+          }
+        }
   }
+
+  this.setState({
+    gridFull:  gridCopy
+  })
+}
+
+checkNeighboursRound = (x, y, z, gridCopy) => {
+  let flag = true;
+  for (let i=x-z; i<x+z; i++)
+    for (let j=y-z; j<y+z; j++)
+      if (((( (i-x)*(i-x) ) + ( (j-y)*(j-y) )) <= (z*z) ) && (gridCopy[i][j] === "#000") )
+        flag = false;
+  
+  return flag;
+}
+
+chekIfFinished = () => {
+  let flag = true;
+  for (let i=0; i<this.cols; i++)
+    for (let j=0; j<this.rows; j++)
+      if (this.state.gridFull[i][j] === '#FFF')
+        flag = false
+
+  this.setState({
+    finished: flag
+  })
+}
+ 
+
 
   clear = () => {
-    clearInterval(this.intervalId);
+    this.enabled = false;
     let grid = Array(this.rows).fill().map(() => Array(this.cols).fill("#FFF"));
     this.setState({
-      gridFull: grid
+      gridFull: grid,
+      finished: false
    })
   }
 
-  save = () => {
-    clearInterval(this.intervalId); 
-    const json = JSON.stringify(this.state.gridFull);
-    localStorage.setItem('grid', json);      
-  }
+  // save = () => {
+  //   const json = JSON.stringify(this.state.gridFull);
+  //   localStorage.setItem('grid', json);      
+  // }
   
 
-  load = () => {
-    clearInterval(this.intervalId);
-    const json = localStorage.getItem('grid');
-    const gridFull = JSON.parse(json);
-    if (gridFull) {
-      this.setState(() => ({gridFull}))
-    }
-  }
+  // load = () => {
+  //   const json = localStorage.getItem('grid');
+  //   const gridFull = JSON.parse(json);
+  //   if (gridFull) {
+  //     this.setState(() => ({gridFull}))
+  //   }
+  // }
 
   play = () => {
-    let flag = true;
-    let g = this.state.gridFull;
-    let g2 = arrayClone(this.state.gridFull);
+    var flag = this.enabled;
+    var g = this.state.gridFull;
+    var g2 = arrayClone(this.state.gridFull);
 
+    while (flag) {
+    flag = false;  
     for (let i = 0; i < this.rows; i++) {
 		  for (let j = 0; j < this.cols; j++) {
         
         if (g[i][j] === "#FFF"){
+          flag = true;
+
           let neighbours = [];
-          flag = false;
-          if (i > 0) if (g[i - 1][j]!=="#FFF") {
-            g2[i][j] = generateColor();
+          
+          if (i > 0) if (g[i - 1][j]!=="#FFF" && g[i - 1][j]!=="#000" ) 
+          {
             neighbours.push(g[i-1][j])
           }
-          if (j < this.cols - 1) if (g[i][j + 1]!=="#FFF") {
-            g2[i][j] = generateColor();
+          if (j < this.cols - 1) if (g[i][j + 1]!=="#FFF" && g[i][j+1]!=="#000" ) 
+          {
             neighbours.push(g[i][j+1]);
           }
-          if (j > 0) if (g[i][j - 1]!=="#FFF") {
-            g2[i][j] = generateColor();
+          if (j > 0) if (g[i][j - 1]!=="#FFF"&& g[i][j-1]!=="#000" ) 
+          {
             neighbours.push(g[i][j-1]); 
           }
-          if (i < this.rows - 1) if (g[i + 1][j]!=="#FFF") {
-            g2[i][j] = generateColor();
+          if (i < this.rows - 1) if (g[i + 1][j]!=="#FFF" && g[i + 1][j]!=="#000" ) 
+          {
             neighbours.push(g[i+1][j]);
           } 
-          if (neighbours.length > 0) g2[i][j] = mostFrequent(neighbours);          
+          if (neighbours.length > 0) g2[i][j] = mostFrequent(neighbours);                 
         }
       }
     }
+    g = arrayClone(g2);
+  }
 
-    if (flag) clearInterval(this.intervalId);
 		this.setState({
-      gridFull: g2
+      gridFull: g2,
+      finished: true
     });
   
   }
   
  
-  onSave() {
-    clearInterval(this.intervalId); 
+  onSave = () =>  {
     var element = document.createElement("a");
     const json = JSON.stringify(this.state.gridFull);
     var blob = new Blob([json], {type: "application/json"});
     element.href = URL.createObjectURL(blob);
-    element.download = "seedGrowthSave.json";
+    element.download = "microstructure.json";
     element.click();
   }
 
@@ -164,21 +303,22 @@ export default class SeedGrowth extends React.Component {
     return (
       <div>
         <h1 className="title-header" style={{width: this.width}}>Seed Growth</h1>
-
-				<Grid
-          gridFull={this.state.gridFull}
-					rows={this.rows}
-					cols={this.cols}
-          selectBox={this.selectBox}
-          width={this.width}
-        />
+        <div className="centerGrid">
+          <Grid
+            gridFull={this.state.gridFull}
+            rows={this.rows}
+            cols={this.cols}
+            selectBox={this.selectBox}
+            width={this.width}
+          />
+        </div>
 
         <div className="button-toolbar">
           <Buttons 
-            playButton={this.playButton}
-            pauseButton={this.pauseButton}
+            playButton={this.play}
             clearButton={this.clear}
-            seedButton={this.seed} 
+            seedButton={this.seed}
+            inclusionsButton={this.state.inclusionsType === 'square' ? this.addInclusionsSquare : this.addInclusionsRound} 
             saveButton={this.save}
             loadButton={this.load} 
             onSave={this.onSave}   
@@ -190,11 +330,32 @@ export default class SeedGrowth extends React.Component {
           }}
           onError={err => console.log(err)}
           accepts={[".json"]}
-          multiple={false}
-      
+          multiple={false}      
           >
           <button className="btn">Load file</button>
         </Files>
+      </div>
+      <div className="button-toolbar">
+        <input type="text" value={this.state.inclusionsNumber} onChange={(e)=>{
+          this.setState({
+            inclusionsNumber: e.target.value
+          })
+        }}/>
+        <select value={this.state.inclusionsType}
+                onChange={(e)=>{
+                  this.setState({
+                    inclusionsType: e.target.value
+                  })
+                }}
+        >
+          <option value="square">square</option>
+          <option value="round">round</option>
+        </select>
+        <input type="text" value={this.state.inclusionsRadius} onChange={(e)=>{
+          this.setState({
+            inclusionsRadius: e.target.value
+          })
+        }}/>
       </div>
 
       </div>
