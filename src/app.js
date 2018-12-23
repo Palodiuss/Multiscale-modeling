@@ -5,6 +5,4 @@ import SeedGrowth from './components/SeedGrowth.js';
 
 
 
-
-
-ReactDOM.render(<SeedGrowth/>, document.getElementById('app'));
+ReactDOM.render(<SeedGrowth />, document.getElementById('app'));
