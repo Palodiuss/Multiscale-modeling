@@ -359,10 +359,11 @@ export default class SeedGrowth extends React.Component {
     for (let k = 0; k < this.state.inclusionsRadius; k++){
       for (let i=0; i<100; i++){
         for (let j=0; j<100; j++){
-          mcArray.push({x: i, y: j});
+          if (gridCopy[i][j] !== "#000")
+            mcArray.push({x: i, y: j});
         }
       }
-      for (let i = 0; i<10000; i++){
+      while(mcArray.length > 0){
         let rnd = Math.floor(Math.random() * (mcArray.length));
         let color;
         while(true){
