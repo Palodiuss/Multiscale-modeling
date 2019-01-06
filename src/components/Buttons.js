@@ -19,6 +19,9 @@ export default class Buttons extends React.Component {
         <button className="btn" onClick={this.props.boundariesButton}>
           boundaries
         </button>
+        <button className="btn" onClick={this.props.energyButton}>
+        calculateEnergy
+      </button>
         <button className="btn" onClick={this.props.onSave}>
           Save File
         </button>

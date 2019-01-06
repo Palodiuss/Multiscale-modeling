@@ -1,6 +1,6 @@
 import React from "react";
 import Files from "react-files";
-import Input from "./Input.js";
+import Energy from './Energy.js';
 import generateColor from "./GenerateColor.js";
 import Buttons from "./Buttons.js";
 import Grid from "./Grid.js";
@@ -20,6 +20,9 @@ export default class SeedGrowth extends React.Component {
       gridFull: Array(this.rows)
         .fill()
         .map(() => Array(this.cols).fill("#FFF")),
+      energyArr: Array(this.rows)
+        .fill()
+        .map(() => Array(this.cols).fill(0)),
       finished: false,
       inclusionsType: "square",
       inclusionsNumber: 15,
@@ -452,6 +455,34 @@ export default class SeedGrowth extends React.Component {
     });
   };
 
+  energyButton = () => {
+    let energyCopy = [...Array(100)].map(x=>Array(100).fill(this.state.inclusionsRadius));
+    for (let x = 0; x < this.cols; x++) {
+      for (let y = 0; y < this.rows; y++) {
+        let cellColor = this.state.gridFull[x][y];
+        if (cellColor !== "#FFF" && cellColor !== "#000") {
+          if (x < this.cols - 1)
+            if (
+              cellColor !== this.state.gridFull[x + 1][y] &&
+              (this.state.gridFull[x + 1][y] !== "#FFF" && this.state.gridFull[x + 1][y] !== "#000")
+            ) {
+              energyCopy[x][y] = this.state.inclusionsNumber; 
+            }
+          if (y < this.rows - 1)
+            if (
+              cellColor !== this.state.gridFull[x][y + 1] &&
+              (this.state.gridFull[x][y + 1] !== "#FFF" && this.state.gridFull[x][y + 1] !== "#000")
+            ) {
+              energyCopy[x][y] = this.state.inclusionsNumber; 
+            }
+        }
+      }
+    }
+  this.setState({
+    energyArr: energyCopy
+  });
+};
+
   onSave = () => {
     var element = document.createElement("a");
     const json = JSON.stringify(this.state.gridFull);
@@ -475,6 +506,12 @@ export default class SeedGrowth extends React.Component {
             selectBox={this.selectPhase}
             width={this.width}
           />
+          <Energy
+          energyArr={this.state.energyArr}
+          rows={this.rows}
+          cols={this.cols}
+          width={this.width}
+        />
         </div>
 
         <div className="button-toolbar">
@@ -492,6 +529,7 @@ export default class SeedGrowth extends React.Component {
                 : this.addInclusionsRound
             }
             boundariesButton={this.boundariesButton}
+            energyButton={this.energyButton}
             onSave={this.onSave}
           />
           <Files
@@ -547,6 +585,8 @@ export default class SeedGrowth extends React.Component {
             <option value="MC">mc</option>
             <option value="DP">dp</option>
           </select>
+
+          
         </div>
       </div>
     );

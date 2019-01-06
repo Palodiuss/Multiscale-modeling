@@ -1,8 +1,18 @@
 import React from "react";
 import Box from "./Box";
 import { Stage, Layer } from "react-konva";
+import generateColor from './GenerateColor';
 
-export default class Grid extends React.Component {
+export default class Energy extends React.Component {
+  constructor(props) {
+    super(props);
+    this.colors = [];
+    for (let i=0; i<20; i++){
+      this.colors[i] = generateColor();
+    }
+  }
+  
+
   render() {
     var rowsArr = [];
 
@@ -12,12 +22,11 @@ export default class Grid extends React.Component {
 
         rowsArr.push(
           <Box
-            boxColor={this.props.gridFull[i][j]}
+            boxColor={this.colors[this.props.energyArr[i][j]]}
             key={boxId}
             boxId={boxId}
             row={i}
             col={j}
-            selectBox={this.props.selectBox}
           />
         );
       }
@@ -30,3 +39,5 @@ export default class Grid extends React.Component {
     );
   }
 }
+
+
