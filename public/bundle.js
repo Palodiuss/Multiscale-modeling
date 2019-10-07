@@ -540,13 +540,13 @@ var _reactDom = __webpack_require__(4);
 
 var _reactDom2 = _interopRequireDefault(_reactDom);
 
-var _IndecisionApp = __webpack_require__(17);
+var _MicrostructureApp = __webpack_require__(17);
 
-var _IndecisionApp2 = _interopRequireDefault(_IndecisionApp);
+var _MicrostructureApp2 = _interopRequireDefault(_MicrostructureApp);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-_reactDom2.default.render(_react2.default.createElement(_IndecisionApp2.default, null), document.getElementById('app'));
+_reactDom2.default.render(_react2.default.createElement(_MicrostructureApp2.default, null), document.getElementById('app'));
 
 /***/ }),
 /* 7 */
@@ -21806,13 +21806,13 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var IndecisonApp = function (_React$Component) {
-  _inherits(IndecisonApp, _React$Component);
+var MicrostructureApp = function (_React$Component) {
+  _inherits(MicrostructureApp, _React$Component);
 
-  function IndecisonApp(props) {
-    _classCallCheck(this, IndecisonApp);
+  function MicrostructureApp(props) {
+    _classCallCheck(this, MicrostructureApp);
 
-    var _this = _possibleConstructorReturn(this, (IndecisonApp.__proto__ || Object.getPrototypeOf(IndecisonApp)).call(this, props));
+    var _this = _possibleConstructorReturn(this, (MicrostructureApp.__proto__ || Object.getPrototypeOf(MicrostructureApp)).call(this, props));
 
     _this.handleDeleteOptions = _this.handleDeleteOptions.bind(_this);
     _this.handlePick = _this.handlePick.bind(_this);
@@ -21824,7 +21824,7 @@ var IndecisonApp = function (_React$Component) {
     return _this;
   }
 
-  _createClass(IndecisonApp, [{
+  _createClass(MicrostructureApp, [{
     key: 'componentDidMount',
     value: function componentDidMount() {
       try {
@@ -21886,7 +21886,7 @@ var IndecisonApp = function (_React$Component) {
   }, {
     key: 'render',
     value: function render() {
-      var title = 'Indecision';
+      var title = 'Microstructure';
       var subtitle = 'Trust the machine!';
 
       return _react2.default.createElement(
@@ -21909,10 +21909,10 @@ var IndecisonApp = function (_React$Component) {
     }
   }]);
 
-  return IndecisonApp;
+  return MicrostructureApp;
 }(_react2.default.Component);
 
-exports.default = IndecisonApp;
+exports.default = MicrostructureApp;
 
 /***/ }),
 /* 18 */
