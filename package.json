@@ -19,7 +19,7 @@
     "css-loader": "^1.0.0",
     "konva": "^2.5.1",
     "live-server": "^1.2.0",
-    "node-sass": "^4.9.4",
+    "node-sass": "^4.13.1",
     "react": "^16.6.1",
     "react-dom": "^16.6.1",
     "react-files": "^2.4.7",
